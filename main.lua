@@ -13,7 +13,6 @@ debug = {
 	end
 }
 
-
 --[[ TEST MAP ]]
 testMap = {
 	dir = 'lab',
@@ -26,16 +25,38 @@ testMap = {
 	-- contains all of the tilesets required to build the map
 	-- explicitly indexed to match layers data
 	sources = {
-		{ file = 'SF_Outside_A5.png', x = 48, y = 48, width = 8, height = 16 } -- TODO: x y is confusing, should be  width, height
+		{ file = 'SF_Outside_A5.png', x = 48, y = 48, width = 8, height = 16 }, -- TODO: x y is confusing, should be  width, height
+		{ file = 'SF_Inside_B.png', x = 48, y = 48, width = 16, height = 16 }, -- TODO: x y is confusing, should be  width, height
+		{ file = 'SF_Inside_B.png', x = 48, y = 48, width = 16, height = 16 } -- TODO: x y is confusing, should be  width, height
 	},
 	
 
 	-- data is {source index, tile index}
 	layers = {
 		{ -- layer 1
-			{{1,50},{1,19},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50}}, -- row 1
-			{{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,30},{1,50},{1,1},{1,50},{1,4},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50},{1,50}} -- row 2
-		}
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50
+		}		
 	} -- data
 } -- testMap
 
@@ -62,46 +83,73 @@ map = {
 		debug.print('load map data')
 		map._data = testMap -- test
 
+
 		-- load tileset images
 		for key,source in pairs(map._data.sources) do
-			debug.print(' file: ' .. source.file)
+			debug.print(' load tileset: ' .. source.file)
 			local tileset = love.graphics.newImage('maps/' .. map._data.dir .. '/' .. source.file)
 			local tilesetBatch = love.graphics.newSpriteBatch(tileset, map._data.width * map._data.height, 'static')
+
 			-- TODO: check for errors
 			map._tilesets[key] = tileset
+			map._tilesetBatch[key] = tilesetBatch
 		end
 
 		-- load used quads
 		for layerKey,layer in pairs(map._data.layers) do -- each layer
-			for rowKey,row in pairs(layer) do -- each row
-				for tileKey,tile in pairs(row) do -- each tile {}
-					local index = tile[2]
+			if (map._tileQuads[layerKey] == nil) then
+				map._tileQuads[layerKey] = {}
+			end
 
-					if (map._tileQuads[layerKey] == nil) then
-						map._tileQuads[layerKey] = {}
-					end
+			for tileKey,tileId in pairs(layer) do
+				-- only the load the quad if this tile id does not exist on this layer
+				if (map._tileQuads[layerKey][tileId] == nil and tileId ~= 0) then
+					local source = map._data.sources[layerKey] -- need source for xy width height
 
-					-- only the load the quad if this index does not exist on this layer
-					if (map._tileQuads[layerKey][index] == nil) then
-						local source = map._data.sources[layerKey]
-						local point = getPointFromIndex(index, source.width, source.x, source.y)
+					local x = math.fmod(tileId-1,source.width) * source.x
+					local y = math.floor((tileId-1) / source.width) * source.y
 
-						map._tileQuads[layerKey][index] = love.graphics.newQuad(point.x, point.y, source.x, source.y, source.x * source.width, source.y * source.height)
-						debug.print('  load quad: layer ' .. layerKey .. ', tile ' .. index)
-					end
+					debug.print(tileId .. ': ' .. x .. ' ' .. y .. ' ' .. source.x .. ' ' .. source.y)
 
-				end -- for tile
-			end -- for row
-			debug.print('  quads loaded: ' .. #map._tileQuads[1])
+					-- add tile to the quad list that will be sent to _tilesBatch
+					map._tileQuads[layerKey][tileId] = love.graphics.newQuad(	x, -- x location of the sprite in the tileset
+																																		y, -- y location of the sprite in the tileset
+																																		source.x, -- width of the sprite in the tileset
+																																		source.y, -- height of the sprite in the tileset
+																																		map._tilesets[layerKey]:getDimensions() -- size of tileset
+																																	)
 
+					--debug.print('  load quad: layer ' .. layerKey .. ', tile ' .. tileId)
+				end
+
+			end -- for tile
 		end -- for layer
 	end, -- load()
 
+	
+	loadTiledLua = function(_file)
+	end,
+
+
 	draw = function ()
-		for key,layer in pairs(map._data.layers) do
-			local tileset = map._tilesets[layer[1][1][1]]
-			local tile = layer[1][1][2]
-		end
+		for layerKey,layer in pairs(map._data.layers) do
+			map._tilesetBatch[layerKey]:clear()
+
+			for tileKey,tileIndex in pairs(layer) do
+				if (tileIndex ~= 0) then
+					local source = map._data.sources[layerKey]
+					local x = math.fmod(tileKey-1,map._data.width) * source.x
+					local y = math.floor((tileKey-1) / map._data.width) * source.y
+
+--				debug.print(tileKey .. ':' .. x .. ':' .. y)
+					map._tilesetBatch[layerKey]:add(map._tileQuads[layerKey][tileIndex], x, y)
+				end -- if
+			end
+			
+			map._tilesetBatch[layerKey]:flush()
+			love.graphics.draw(map._tilesetBatch[layerKey])
+		end -- for layer
+
 	end
 }
 
@@ -167,12 +215,5 @@ end
 function love.update(_dt)
 	--- send updates to entities
 	entities.call('update', {dt = _dt, g = game})
-end
-
--- given a index, size(width of tileset in tiles), width, height: return the starting x,y values of a tile
-function getPointFromIndex(_index, _size, _width, _height)
-	local y = math.ceil(_index / _size)
-	local x = (_size + (_index - (y * _size)))
-	return { x = x * _width, y = y * _height}
 end
 
