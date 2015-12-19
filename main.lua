@@ -13,53 +13,11 @@ debug = {
 	end
 }
 
---[[ TEST MAP ]]
-testMap = {
-	dir = 'lab',
-	name = 'Plikard',
+package.path = package.path .. ';maps/?.lua'
 
-	-- width and height are given in tile count
-	width = 22,
-	height = 22,
-
-	-- contains all of the tilesets required to build the map
-	-- explicitly indexed to match layers data
-	sources = {
-		{ file = 'SF_Outside_A5.png', x = 48, y = 48, width = 8, height = 16 }, -- TODO: x y is confusing, should be  width, height
-		{ file = 'SF_Inside_B.png', x = 48, y = 48, width = 16, height = 16 }, -- TODO: x y is confusing, should be  width, height
-		{ file = 'SF_Inside_B.png', x = 48, y = 48, width = 16, height = 16 } -- TODO: x y is confusing, should be  width, height
-	},
-	
-
-	-- data is {source index, tile index}
-	layers = {
-		{ -- layer 1
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-      50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50
-		}		
-	} -- data
-} -- testMap
-
+--[[ REQUIRE ]]
+require('testMap')
+require('lab')
 
 --[[ GAME ]]
 -- global game object
@@ -104,12 +62,17 @@ map = {
 			for tileKey,tileId in pairs(layer) do
 				-- only the load the quad if this tile id does not exist on this layer
 				if (map._tileQuads[layerKey][tileId] == nil and tileId ~= 0) then
+					tileId = tileId - map._data.sources[layerKey].tiledAdjust
+					debug.print('id:' .. tileId)
+					debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
+					debug.print('re:' .. tileId - map._data.sources[layerKey].tiledAdjust)
+
 					local source = map._data.sources[layerKey] -- need source for xy width height
 
 					local x = math.fmod(tileId-1,source.width) * source.x
 					local y = math.floor((tileId-1) / source.width) * source.y
 
-					debug.print(tileId .. ': ' .. x .. ' ' .. y .. ' ' .. source.x .. ' ' .. source.y)
+				--	debug.print(tileId .. ': ' .. x .. ' ' .. y .. ' ' .. source.x .. ' ' .. source.y)
 
 					-- add tile to the quad list that will be sent to _tilesBatch
 					map._tileQuads[layerKey][tileId] = love.graphics.newQuad(	x, -- x location of the sprite in the tileset
@@ -137,6 +100,11 @@ map = {
 
 			for tileKey,tileIndex in pairs(layer) do
 				if (tileIndex ~= 0) then
+					debug.print('id:' .. tileIndex)
+					debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
+					debug.print(tileIndex)
+					tileIndex = tileIndex - map._data.sources[layerKey].tiledAdjust
+
 					local source = map._data.sources[layerKey]
 					local x = math.fmod(tileKey-1,map._data.width) * source.x
 					local y = math.floor((tileKey-1) / map._data.width) * source.y
