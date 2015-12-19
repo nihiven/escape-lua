@@ -11,6 +11,7 @@ debug = {
 			print(_text)
 		end
 	end
+
 }
 
 package.path = package.path .. ';maps/?.lua'
@@ -55,24 +56,26 @@ map = {
 
 		-- load used quads
 		for layerKey,layer in pairs(map._data.layers) do -- each layer
-			if (map._tileQuads[layerKey] == nil) then
-				map._tileQuads[layerKey] = {}
-			end
+
+			-- default this to empty if does not exist
+			if (map._tileQuads[layerKey] == nil) then map._tileQuads[layerKey] = {} end
 
 			for tileKey,tileId in pairs(layer) do
 				-- only the load the quad if this tile id does not exist on this layer
 				if (map._tileQuads[layerKey][tileId] == nil and tileId ~= 0) then
-					tileId = tileId - map._data.sources[layerKey].tiledAdjust
-					debug.print('id:' .. tileId)
-					debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
-					debug.print('re:' .. tileId - map._data.sources[layerKey].tiledAdjust)
+					tileId = tileId - map._data.sources[layerKey].tiledAdjust  -- adjust for Tiled index offset 'firstgid - 1'
+					--debug.print('id:' .. tileId)
+					--debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
+					--debug.print('re:' .. tileId - map._data.sources[layerKey].tiledAdjust)
 
-					local source = map._data.sources[layerKey] -- need source for xy width height
+					-- shortcut: need source for xy width height
+					local source = map._data.sources[layerKey] 
 
+					-- local x,y are grid coordinates, source values are pixel values for the grid
 					local x = math.fmod(tileId-1,source.width) * source.x
 					local y = math.floor((tileId-1) / source.width) * source.y
 
-				--	debug.print(tileId .. ': ' .. x .. ' ' .. y .. ' ' .. source.x .. ' ' .. source.y)
+					--debug.print(tileId .. ': ' .. x .. ' ' .. y .. ' ' .. source.x .. ' ' .. source.y)
 
 					-- add tile to the quad list that will be sent to _tilesBatch
 					map._tileQuads[layerKey][tileId] = love.graphics.newQuad(	x, -- x location of the sprite in the tileset
@@ -94,30 +97,40 @@ map = {
 	end,
 
 
-	draw = function ()
+	draw = function(self, _parameters)
+		local deferred = _parameters.deferred or false -- default to false
+
+		-- when accesing sources / layers layerKey always refers to the current layer
 		for layerKey,layer in pairs(map._data.layers) do
-			map._tilesetBatch[layerKey]:clear()
-
-			for tileKey,tileIndex in pairs(layer) do
-				if (tileIndex ~= 0) then
-					debug.print('id:' .. tileIndex)
-					debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
-					debug.print(tileIndex)
-					tileIndex = tileIndex - map._data.sources[layerKey].tiledAdjust
-
-					local source = map._data.sources[layerKey]
-					local x = math.fmod(tileKey-1,map._data.width) * source.x
-					local y = math.floor((tileKey-1) / map._data.width) * source.y
-
---				debug.print(tileKey .. ':' .. x .. ':' .. y)
-					map._tilesetBatch[layerKey]:add(map._tileQuads[layerKey][tileIndex], x, y)
-				end -- if
-			end
 			
-			map._tilesetBatch[layerKey]:flush()
-			love.graphics.draw(map._tilesetBatch[layerKey])
-		end -- for layer
+			-- only draw layers that match incoming deferred parameter
+			if (deferred == map._data.sources[layerKey].deferred) then
+				map._tilesetBatch[layerKey]:clear()
 
+				for tileKey,tileIndex in pairs(layer) do
+					if (tileIndex ~= 0) then -- 0 are empty tiles
+						--debug.print('id:' .. tileIndex)
+						--debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
+						--debug.print(tileIndex)
+						tileIndex = tileIndex - map._data.sources[layerKey].tiledAdjust -- adjust for Tiled index offset 'firstgid - 1'
+
+						-- shortcut: need source for xy width height
+						local source = map._data.sources[layerKey]
+
+						-- local x,y are grid coordinates, source values are pixel values for the grid
+						local x = math.fmod(tileKey-1,map._data.width) * source.x
+						local y = math.floor((tileKey-1) / map._data.width) * source.y
+
+						--debug.print(tileKey .. ':' .. x .. ':' .. y)
+						map._tilesetBatch[layerKey]:add(map._tileQuads[layerKey][tileIndex], x, y)
+					end -- if
+				end
+				
+				map._tilesetBatch[layerKey]:flush()
+				love.graphics.draw(map._tilesetBatch[layerKey])
+
+			end -- if deferred
+		end -- for layer
 	end
 }
 
@@ -173,7 +186,11 @@ function love.load()
 end
 
 function love.draw()
-	entities.call('draw')
+	entities.call('draw', { deferred = false })
+	-- entities non-deferred
+
+	entities.call('draw', { deferred = true })
+	-- entities deferred
 
 	if (debug == true) then 
 		entities.call('debug')
