@@ -4,21 +4,23 @@ testMap = {
 	name = 'Plikard',
 
 	-- width and height are given in tile count
-       pixelsPerTile = 48, -- TODO: change name, etc
-       tilesPerRow = 44, -- TODO: change location, fix with sources and width/height
+--       pixelsPerGrid = 24, -- TODO: change name, etc
+--       tilesPerRow = 44, -- TODO: change location, fix with sources and width/height
 	width = 44,
 	height = 44,
-       spawn = {x = 3, y = 4},
+       tileWidth = 24,
+       tileHeight = 24,
+       spawn = {x = 4, y = 8},
 
 	-- contains all of the tilesets required to build the map
 	-- explicitly indexed to match layers data
 	sources = {
-		{ name = 'floor', file = 'SF_Outside_A5.png', deferred = false, x = 24, y = 24, width = 16, height = 32, tiledAdjust = 0 }, -- TODO: x y is confusing, should be  width, height
-		{ name = 'walls', file = 'SF_Inside_A4.png', deferred = false, x = 24, y = 24, width = 32, height = 32, tiledAdjust = 512 }, -- TODO: x y is confusing, should be  width, height
-		{ name = 'decorations', file = 'SF_Inside_B.png', deferred = true, x = 24, y = 24, width = 32, height = 32, tiledAdjust = 1472 } -- TODO: x y is confusing, should be  width, height
+		{ name = 'floor', file = 'SF_Outside_A5.png', deferred = false, width = 16, height = 32, tiledAdjust = 0 }, -- TODO: x y is confusing, should be  width, height
+		{ name = 'walls', file = 'SF_Inside_A4.png', deferred = false, width = 32, height = 32, tiledAdjust = 512 }, -- TODO: x y is confusing, should be  width, height
+		{ name = 'decorations', file = 'SF_Inside_B.png', deferred = true, width = 32, height = 32, tiledAdjust = 1472 } -- TODO: x y is confusing, should be  width, height
 	},
 	layers = {
-		        {
+              {
               195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196,
               211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212, 211, 212,
               195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196, 195, 196,

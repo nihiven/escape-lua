@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="44" height="44" tilewidth="24" tileheight="24" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="44" height="44" tilewidth="24" tileheight="24" nextobjectid="6">
  <tileset firstgid="1" name="Floor" tilewidth="24" tileheight="24" tilecount="512">
   <image source="lab/SF_Outside_A5.png" width="384" height="768"/>
  </tileset>
@@ -154,6 +154,9 @@
 </data>
  </layer>
  <layer name="Movement" width="44" height="44">
+  <properties>
+   <property name="movement" value="true"/>
+  </properties>
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -201,4 +204,7 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="5" x="49" y="219" width="48" height="45"/>
+ </objectgroup>
 </map>
