@@ -2,3 +2,4 @@ luda.conf
  - window title	
 
 look at metatables
+

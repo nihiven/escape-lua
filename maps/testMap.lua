@@ -4,9 +4,11 @@ testMap = {
 	name = 'Plikard',
 
 	-- width and height are given in tile count
+       pixelsPerTile = 48, -- TODO: change name, etc
+       tilesPerRow = 44, -- TODO: change location, fix with sources and width/height
 	width = 44,
 	height = 44,
-  spawn = {22,22},
+       spawn = {x = 3, y = 4},
 
 	-- contains all of the tilesets required to build the map
 	-- explicitly indexed to match layers data
