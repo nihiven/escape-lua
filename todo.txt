@@ -1,15 +1,11 @@
 + ---------------------------------------------------------------------------- +
-| TODOS @ Tuesday 29 December 2015 01:03                                       |
+| TODOS @ Tuesday 29 December 2015 03:29                                       |
 | 6 files scanned                                                              |
 + ---------------------------------------------------------------------------- +
 
-## TODO (9)
+## TODO (5)
 1. main.lua:42  figure this out later
-2. map.lua:22  check for errors
-3. map.lua:129  stupid
-4. map.lua:130  stupid
-5. testMap.lua:7  change name, etc
-6. testMap.lua:8  change location, fix with sources and width/height
-7. testMap.lua:18  x y is confusing, should be  width, height
-8. testMap.lua:19  x y is confusing, should be  width, height
-9. testMap.lua:20  x y is confusing, should be  width, height
+2. map.lua:21  check for errors
+3. map.lua:128  stupid
+4. map.lua:129  stupid
+5. todo.txt:2 03                                      

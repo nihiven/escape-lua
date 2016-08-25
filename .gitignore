@@ -45,3 +45,5 @@ luac.out
 # tests
 *.rockspec
 *.sublime-workspace
+escape.sublime-workspace
+todo.txt

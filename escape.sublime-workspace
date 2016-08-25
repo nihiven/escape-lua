@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"layer",
+				"layerKey"
+			],
+			[
 				"ev",
 				"love.event.push"
 			],
@@ -83,15 +87,18 @@
 			"file": "main.lua",
 			"settings":
 			{
-				"buffer_size": 2686,
+				"buffer_size": 2795,
 				"line_ending": "Windows"
 			}
 		},
 		{
+			"contents": "--[[ MAP ]]\n-- global map object\n-- loads map definition file, textures and layout\n-- draws map to screen\nreturn {\n	-- map properties from tiled file\n	_width = nil,\n	_height = nil,\n	_renderorder = nil,\n\n	-- internal components\n	_layers = {},\n	_tilesets = {}, -- image object for tilesets\n	_tilesetBatch = {},\n	_tileQuads = {},\n\n	load = function(self, _game)\n		debug.print('load map data')\n\n		-- load main map information\n\n		\n		-- load tileset images and create tileset batch\n		for key,source in pairs(self._data.tilesets) do\n			debug.print(' load tileset: ' .. source.file)\n			local tileset = love.graphics.newImage('maps/' .. source.file)\n			local tilesetBatch = love.graphics.newSpriteBatch(tileset, self._data.width * self._data.height, 'static')\n\n			-- TODO: check for errors\n			self._tilesets[key] = tileset\n			self._tilesetBatch[key] = tilesetBatch\n		end\n		debug.print(' tilesets loaded')\n\n\n		-- load used quads\n		-- quads are the tiles from a given layer, referenced in layers.data[] \n		-- if map layers.data[x] has quad 195, we need to create a new Love quad from the layer image using the coordinates for tile 195\n\n\n\n		debug.print('map.load() complete')\n	end, -- load()\n\n	draw = function(self, _parameters)\n		local deferred = _parameters.deferred or false -- default to false\n\n		-- when accesing sources / layers layerKey always refers to the current layer\n		for layerKey,layer in pairs(self._data.layers) do\n			\n			-- only draw layers that match incoming deferred parameter\n			if (deferred == self._data.sources[layerKey].deferred) then\n				self._tilesetBatch[layerKey]:clear()\n\n				for tileKey,tileIndex in pairs(layer) do\n					if (tileIndex ~= 0) then -- 0 are empty tiles\n						--debug.print('id:' .. tileIndex)\n						--debug.print('ad:' .. self._data.sources[layerKey].tiledAdjust)\n						--debug.print(tileIndex)\n						tileIndex = tileIndex - self._data.sources[layerKey].tiledAdjust -- adjust for Tiled index offset 'firstgid - 1'\n\n						-- shortcut: need source for xy width height\n						local source = self._data.sources[layerKey]\n\n						-- local x,y are grid coordinates, source values are pixel values for the grid\n						local x = math.fmod(tileKey-1,self._data.width) * self._data.tileWidth\n						local y = math.floor((tileKey-1) / self._data.width) * self._data.tileHeight\n\n						--debug.print(tileKey .. ':' .. x .. ':' .. y)\n						self._tilesetBatch[layerKey]:add(self._tileQuads[layerKey][tileIndex], x, y)\n					end -- if\n				end\n				\n				self._tilesetBatch[layerKey]:flush()\n				love.graphics.draw(self._tilesetBatch[layerKey])\n\n			end -- if deferred\n		end -- for layer\n	end, -- draw\n\n	--------\n	-- highlightGrid()\n	--------\n	highlightGrid = function(_x, _y)\n		local xy = self.getXYFromGrid(_x, _y)\n		love.graphics.setColor(0, 255, 0)\n		love.graphics.rectangle('line', xy.x, xy.y, self._data.tileWidth-1, self._data.tileHeight-1)\n		love.graphics.setColor(255, 255, 255)\n	end,\n\n	--------\n	-- isMoveable()\n	--------\n	isMoveable = function(_x, _y, _width, _height)\n		local grid = self.getGridFromXY(_x, _y)\n		local key = (grid.y * self._data.width) + grid.x\n		local moveable = self._data.movement[key1]\n\n		love.graphics.setColor(0, 255, 0)\n		self.highlightGrid(grid.x, grid.y)\n		love.graphics.setColor(255, 255, 255)\n\n		--debug.print(grid.x .. '/' .. grid.y)\n		--debug.print(key)\n		--debug.print(moveable)\n		if (moveable == 1) then\n			return false\n		else\n			return true\n		end\n	end,\n\n	--------\n	-- getGridFromXy()\n	--------\n	getGridFromXY = function(_x, _y)\n		local x = math.ceil(_x / self._data.tileWidth) -- always half of the number of pixels per tile ? TODO: stupid\n		local y = math.ceil(_y / self._data.tileHeight) -- always half of the number of pixels per tile ? TODO: stupid\n		return {x = x, y = y}\n	end,\n\n	--------\n	-- getXYFromGrid()\n	--------\n	getXYFromGrid = function(_x, _y)\n		-- subtract one to offset the 1,1 grid translation\n		local x = math.floor((_x-1) * self._data.tileWidth)\n		local y = math.floor((_y-1) * self._data.tileHeight)\n		return {x = x, y = y}\n	end,\n\n	--------\n	-- conversion()\n	-- converts from Tiled LUA format\n	--------\n	conversion = function(_mapFile)\n		debug.print('map.conversion()' .. ': _mapFile: ' .. _mapFile)\n		local plicard = require(_mapFile)\n		local m = {}\n		m.width = plicard.width\n		m.height = plicard.height\n		m.tileWidth = plicard.tilewidth\n		m.tileHeight = plicard.tileheight\n\n		m.tilesets = {}\n		for key,value in pairs(plicard.tilesets) do\n			m.tilesets[key] = value\n			m.tilesets[key].file = m.tilesets[key].image -- because we want image to be an image object and file to be the file name\n			m.tilesets[key].image = nil -- haven't loaded the image yet\n		end\n\n		m.layers = {}\n		for key,value in pairs(plicard.layers) do\n			m.layers[key] = {}\n			m.layers[key].name = value.name\n\n			if (value.type == 'tilelayer') then\n				for index,tile in pairs(value.data) do\n					local x = math.fmod((index-1),m.width) + 1\n					local y = math.floor((index-1) / m.width) + 1\n\n					if (m.layers[key][y] == nil) then m.layers[key][y] = {} end\n					m.layers[key][y][x] = tile\n				end\n			end\n\n			-- if 'objectgroup'\n		end\n\n		--[[\n		local serpent = require('serpent')\n		local file = io.output('conv_'.._dir..'.lua')\n		io.write(serpent.block(m, {comment = false})) -- multi-line indented, no self-ref section\n		io.close(file)\n		]]\n\n		return m\n	end\n}\n\n",
 			"file": "map.lua",
+			"file_size": 5493,
+			"file_write_time": 131166142061959617,
 			"settings":
 			{
-				"buffer_size": 6271,
+				"buffer_size": 5301,
 				"line_ending": "Windows"
 			}
 		},
@@ -99,7 +106,7 @@
 			"file": "player.lua",
 			"settings":
 			{
-				"buffer_size": 2997,
+				"buffer_size": 2995,
 				"line_ending": "Windows"
 			}
 		},
@@ -107,23 +114,15 @@
 			"file": "maps/plicard.lua",
 			"settings":
 			{
-				"buffer_size": 32590,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "maps/lab.lua",
-			"settings":
-			{
 				"buffer_size": 32597,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "todo.txt",
+			"file": "maps/testMap.lua",
 			"settings":
 			{
-				"buffer_size": 743,
+				"buffer_size": 31865,
 				"line_ending": "Windows"
 			}
 		}
@@ -131,7 +130,7 @@
 	"build_system": "Packages/User/nihiven.sublime-build",
 	"command_palette":
 	{
-		"height": 150.0,
+		"height": 35.0,
 		"selected_items":
 		[
 			[
@@ -208,11 +207,32 @@
 	},
 	"file_history":
 	[
+		"/C/Users/nihiven/Desktop/map.lua",
+		"/E/Google Drive/Code/python/value-prop/gameUpdateQueue.py",
+		"/E/Google Drive/Code/python/destiny-exotic-tracker/exotic.py",
+		"/C/Users/nihiven/Desktop/testWeb/Focus/credits.html",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/3rdparty/serpent/README.md",
+		"/C/Users/nihiven/Desktop/Documentation/Documentation.html",
+		"/C/Users/nihiven/Desktop/LinuxShare/bx.sh",
+		"/C/Users/Public/Desktop/Elite Dangerous Launcher.lnk",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/todo.txt",
+		"/E/Games/steam/SteamApps/common/Starbound/doc/lua/projectile.md",
+		"/E/Games/steam/SteamApps/common/Starbound/doc/OPENSOURCE.md",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/test.sql",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/maps/lab.lua",
 		"/E/Google Drive/Code/Game Prototypes/escape-lua/maps/plicard.lua",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/escape.sublime-project",
+		"/C/Users/nihiven/Desktop/sbh/SuperBloodHockey/SuperBloodHockey.csproj",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/player.lua",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/map.lua",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/main.lua",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/3rdparty/anim8/anim8.lua",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/3rdparty/inspect.lua",
+		"/E/Google Drive/www/nihiven.github.io/index.html",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/conv_plicard.lua",
+		"/E/Google Drive/Code/Game Prototypes/escape-lua/plicard.lua",
 		"/E/Google Drive/Code/Game Prototypes/escape-lua/testConv.lua",
 		"/E/Google Drive/Code/Game Prototypes/escape-lua/maps/testMap.lua",
-		"/E/Google Drive/Code/Game Prototypes/escape-lua/todo.txt",
-		"/E/Google Drive/Code/Game Prototypes/escape-lua/maps/lab.lua",
 		"/E/Google Drive/Code/Game Prototypes/escape-lua/maps/testlab.lua",
 		"/C/Users/nihiven/AppData/Roaming/Sublime Text 2/Packages/User/Preferences.sublime-settings",
 		"/E/Google Drive/Code/Game Prototypes/escape-lua/player",
@@ -229,7 +249,6 @@
 		"/E/Google Drive/Code/ld34/menu.lua",
 		"/E/Google Drive/Code/ld34/logic.lua",
 		"/E/Google Drive/RPGMV/Focus/fonts/gamefont.css",
-		"/E/Google Drive/www/nihiven.github.io/index.html",
 		"/E/Google Drive/Code/ld34/game.lua",
 		"/C/652C030D3D26",
 		"/C/fallout3",
@@ -331,6 +350,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"map.",
+			"debug",
+			"1",
 			"[44]",
 			"nil",
 			"image",
@@ -437,6 +459,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"3",
 			"_pf(",
 			"_p(",
 			"messagesColorPeople",
@@ -463,15 +486,15 @@
 					"file": "main.lua",
 					"settings":
 					{
-						"buffer_size": 2686,
+						"buffer_size": 2795,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								221,
-								221
+								618,
+								618
 							]
 						],
 						"settings":
@@ -480,7 +503,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 84.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -490,15 +513,15 @@
 					"file": "map.lua",
 					"settings":
 					{
-						"buffer_size": 6271,
+						"buffer_size": 5301,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5229,
-								5229
+								896,
+								896
 							]
 						],
 						"settings":
@@ -517,49 +540,21 @@
 					"file": "player.lua",
 					"settings":
 					{
-						"buffer_size": 2997,
+						"buffer_size": 2995,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1599,
-								1599
+								2754,
+								2754
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/Lua/Lua.tmLanguage",
 							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "maps/plicard.lua",
-					"settings":
-					{
-						"buffer_size": 32590,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -574,8 +569,8 @@
 			"sheets":
 			[
 				{
-					"buffer": 4,
-					"file": "maps/lab.lua",
+					"buffer": 3,
+					"file": "maps/plicard.lua",
 					"settings":
 					{
 						"buffer_size": 32597,
@@ -585,8 +580,8 @@
 						"selection":
 						[
 							[
-								32247,
-								32247
+								449,
+								449
 							]
 						],
 						"settings":
@@ -596,30 +591,32 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2982.0,
+						"translation.y": 546.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "todo.txt",
+					"buffer": 4,
+					"file": "maps/testMap.lua",
 					"settings":
 					{
-						"buffer_size": 743,
+						"buffer_size": 31865,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								417,
-								417
+								979,
+								979
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 7,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -658,7 +655,7 @@
 		"cols":
 		[
 			0.0,
-			0.636826783115,
+			0.474828175587,
 			1.0
 		],
 		"rows":
@@ -670,7 +667,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 269.0
+		"height": 204.0
 	},
 	"output.git":
 	{
@@ -698,9 +695,9 @@
 		"width": 0.0
 	},
 	"show_minimap": true,
-	"show_open_files": false,
+	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_visible": false,
+	"side_bar_width": 90.0,
 	"status_bar_visible": true
 }
