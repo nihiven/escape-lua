@@ -2,116 +2,103 @@
 -- global map object
 -- loads map definition file, textures and layout
 -- draws map to screen
-map = {
-	_data = nil,
-	_tilesets = {},
+return {
+	-- map properties from tiled file
+	_width = nil,
+	_height = nil,
+	_renderorder = nil,
+
+	-- internal components
+	_layers = {},
+	_tilesets = {}, -- image object for tilesets
 	_tilesetBatch = {},
 	_tileQuads = {},
 
-	load = function(_data)
+	load = function(self, _game)
 		debug.print('load map data')
-		map._data = map.conversion(game.map)
+
+		-- load main map information
+
 		
-		-- load tileset images
-		for key,source in pairs(map._data.sources) do
+		-- load tileset images and create tileset batch
+		for key,source in pairs(self._data.tilesets) do
 			debug.print(' load tileset: ' .. source.file)
-			local tileset = love.graphics.newImage('maps/' .. map._data.dir .. '/' .. source.file)
-			local tilesetBatch = love.graphics.newSpriteBatch(tileset, map._data.width * map._data.height, 'static')
+			local tileset = love.graphics.newImage('maps/' .. source.file)
+			local tilesetBatch = love.graphics.newSpriteBatch(tileset, self._data.width * self._data.height, 'static')
 
 			-- TODO: check for errors
-			map._tilesets[key] = tileset
-			map._tilesetBatch[key] = tilesetBatch
+			self._tilesets[key] = tileset
+			self._tilesetBatch[key] = tilesetBatch
 		end
+		debug.print(' tilesets loaded')
+
 
 		-- load used quads
-		for layerKey,layer in pairs(map._data.layers) do -- each layer
+		-- quads are the tiles from a given layer that are used in the map
+		-- so if map layer data has quad 195 in 0,0 we need to create a new Love quad from
+		-- the layer image and the correct coordinates for tile 195
 
-			-- default this to empty if does not exist
-			if (map._tileQuads[layerKey] == nil) then map._tileQuads[layerKey] = {} end
 
-			for tileKey,tileId in pairs(layer) do
-				-- only the load the quad if this tile id does not exist on this layer
-				if (map._tileQuads[layerKey][tileId] == nil and tileId ~= 0) then
-					tileId = tileId - map._data.sources[layerKey].tiledAdjust  -- adjust for Tiled index offset 'firstgid - 1'
-					--debug.print('id:' .. tileId)
-					--debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
-					--debug.print('re:' .. tileId - map._data.sources[layerKey].tiledAdjust)
 
-					-- shortcut: need source for xy width height
-					local source = map._data.sources[layerKey] 
-
-					-- local x,y are grid coordinates, source values are pixel values for the grid
-					local x = math.fmod(tileId-1,map._data.width) * map._data.tileWidth
-					local y = math.floor((tileId-1) / map._data.width) * map._data.tileHeight
-
-					--debug.print(tileId .. ': ' .. x .. ' ' .. y .. ' ' .. source.x .. ' ' .. source.y)
-
-					-- add tile to the quad list that will be sent to _tilesBatch
-					map._tileQuads[layerKey][tileId] = love.graphics.newQuad(	x, -- x location of the sprite in the tileset
-																																		y, -- y location of the sprite in the tileset
-																																		map._data.tileWidth, -- width of the sprite in the tileset
-																																		map._data.tileHeight, -- height of the sprite in the tileset
-																																		map._tilesets[layerKey]:getDimensions() -- size of tileset
-																																	)
-
-					--debug.print('  load quad: layer ' .. layerKey .. ', tile ' .. tileId)
-				end
-
-			end -- for tile
-		end -- for layer
-		debug.print('done')
+		debug.print('map.load() complete')
 	end, -- load()
 
 	draw = function(self, _parameters)
 		local deferred = _parameters.deferred or false -- default to false
 
 		-- when accesing sources / layers layerKey always refers to the current layer
-		for layerKey,layer in pairs(map._data.layers) do
+		for layerKey,layer in pairs(self._data.layers) do
 			
 			-- only draw layers that match incoming deferred parameter
-			if (deferred == map._data.sources[layerKey].deferred) then
-				map._tilesetBatch[layerKey]:clear()
+			if (deferred == self._data.sources[layerKey].deferred) then
+				self._tilesetBatch[layerKey]:clear()
 
 				for tileKey,tileIndex in pairs(layer) do
 					if (tileIndex ~= 0) then -- 0 are empty tiles
 						--debug.print('id:' .. tileIndex)
-						--debug.print('ad:' .. map._data.sources[layerKey].tiledAdjust)
+						--debug.print('ad:' .. self._data.sources[layerKey].tiledAdjust)
 						--debug.print(tileIndex)
-						tileIndex = tileIndex - map._data.sources[layerKey].tiledAdjust -- adjust for Tiled index offset 'firstgid - 1'
+						tileIndex = tileIndex - self._data.sources[layerKey].tiledAdjust -- adjust for Tiled index offset 'firstgid - 1'
 
 						-- shortcut: need source for xy width height
-						local source = map._data.sources[layerKey]
+						local source = self._data.sources[layerKey]
 
 						-- local x,y are grid coordinates, source values are pixel values for the grid
-						local x = math.fmod(tileKey-1,map._data.width) * map._data.tileWidth
-						local y = math.floor((tileKey-1) / map._data.width) * map._data.tileHeight
+						local x = math.fmod(tileKey-1,self._data.width) * self._data.tileWidth
+						local y = math.floor((tileKey-1) / self._data.width) * self._data.tileHeight
 
 						--debug.print(tileKey .. ':' .. x .. ':' .. y)
-						map._tilesetBatch[layerKey]:add(map._tileQuads[layerKey][tileIndex], x, y)
+						self._tilesetBatch[layerKey]:add(self._tileQuads[layerKey][tileIndex], x, y)
 					end -- if
 				end
 				
-				map._tilesetBatch[layerKey]:flush()
-				love.graphics.draw(map._tilesetBatch[layerKey])
+				self._tilesetBatch[layerKey]:flush()
+				love.graphics.draw(self._tilesetBatch[layerKey])
 
 			end -- if deferred
 		end -- for layer
 	end, -- draw
 
+	--------
+	-- highlightGrid()
+	--------
 	highlightGrid = function(_x, _y)
-		local xy = map.getXYFromGrid(_x, _y)
+		local xy = self.getXYFromGrid(_x, _y)
 		love.graphics.setColor(0, 255, 0)
-		love.graphics.rectangle('line', xy.x, xy.y, map._data.tileWidth-1, map._data.tileHeight-1)
+		love.graphics.rectangle('line', xy.x, xy.y, self._data.tileWidth-1, self._data.tileHeight-1)
 		love.graphics.setColor(255, 255, 255)
 	end,
 
+	--------
+	-- isMoveable()
+	--------
 	isMoveable = function(_x, _y, _width, _height)
-		local grid = map.getGridFromXY(_x, _y)
-		local key = (grid.y * map._data.width) + grid.x
-		local moveable = map._data.movement[key1]
+		local grid = self.getGridFromXY(_x, _y)
+		local key = (grid.y * self._data.width) + grid.x
+		local moveable = self._data.movement[key1]
 
 		love.graphics.setColor(0, 255, 0)
-		map.highlightGrid(grid.x, grid.y)
+		self.highlightGrid(grid.x, grid.y)
 		love.graphics.setColor(255, 255, 255)
 
 		--debug.print(grid.x .. '/' .. grid.y)
@@ -124,21 +111,32 @@ map = {
 		end
 	end,
 
+	--------
+	-- getGridFromXy()
+	--------
 	getGridFromXY = function(_x, _y)
-		local x = math.ceil(_x / map._data.tileWidth) -- always half of the number of pixels per tile ? TODO: stupid
-		local y = math.ceil(_y / map._data.tileHeight) -- always half of the number of pixels per tile ? TODO: stupid
+		local x = math.ceil(_x / self._data.tileWidth) -- always half of the number of pixels per tile ? TODO: stupid
+		local y = math.ceil(_y / self._data.tileHeight) -- always half of the number of pixels per tile ? TODO: stupid
 		return {x = x, y = y}
 	end,
 
+	--------
+	-- getXYFromGrid()
+	--------
 	getXYFromGrid = function(_x, _y)
 		-- subtract one to offset the 1,1 grid translation
-		local x = math.floor((_x-1) * map._data.tileWidth)
-		local y = math.floor((_y-1) * map._data.tileHeight)
+		local x = math.floor((_x-1) * self._data.tileWidth)
+		local y = math.floor((_y-1) * self._data.tileHeight)
 		return {x = x, y = y}
 	end,
 
-	conversion = function(_dir)
-		local plicard = require(_dir)
+	--------
+	-- conversion()
+	-- converts from Tiled LUA format
+	--------
+	conversion = function(_mapFile)
+		debug.print('map.conversion()' .. ': _mapFile: ' .. _mapFile)
+		local plicard = require(_mapFile)
 		local m = {}
 		m.width = plicard.width
 		m.height = plicard.height
@@ -148,8 +146,8 @@ map = {
 		m.tilesets = {}
 		for key,value in pairs(plicard.tilesets) do
 			m.tilesets[key] = value
-			m.tilesets[key].file = m.tilesets[key].image
-			m.tilesets[key].image = nil
+			m.tilesets[key].file = m.tilesets[key].image -- because we want image to be an image object and file to be the file name
+			m.tilesets[key].image = nil -- haven't loaded the image yet
 		end
 
 		m.layers = {}

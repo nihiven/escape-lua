@@ -1,7 +1,7 @@
 
 --[[ PLAYER ]]
 -- controls player movement, drawing
-player = {
+return {
 	_x = 100,
 	_y = 100,
 	_height = 48,

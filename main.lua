@@ -15,15 +15,18 @@ debug = {
 }
 
 -- required to import 3rd party libraries
-package.path = package.path .. ';maps/?.lua;3rdparty/anim8/?.lua;3rdparty/serpent/src/?.lua'
+-- add these paths to the script search location
+package.path = package.path .. ';3rdparty/?.lua;maps/?.lua;3rdparty/anim8/?.lua;3rdparty/serpent/src/?.lua'
 
 --[[ REQUIRE ]]
 -- 3rd party
+inspect = require('inspect')
 require('anim8')
 
 -- home grown
-require('map')
-require('player')
+map = require('map')
+player = require('player')
+
 
 --[[ GAME ]]
 -- global game object

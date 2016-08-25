@@ -44,3 +44,4 @@ luac.out
 
 # tests
 *.rockspec
+*.sublime-workspace
